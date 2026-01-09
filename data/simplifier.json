@@ -1,0 +1,34 @@
+[
+    {
+        "input": "x = 0\nfor i in range(len(arr)):\n    x = x + arr[i]",
+        "output": "**Simplified Code:**\n```python\nx = sum(arr)\n```\n\n**Improvements:**\n- Used built-in sum() function\n- More readable and Pythonic\n- Faster execution"
+    },
+    {
+        "input": "if x > 5:\n    return True\nelse:\n    return False",
+        "output": "**Simplified Code:**\n```python\nreturn x > 5\n```\n\n**Improvements:**\n- Direct boolean return\n- Eliminates unnecessary if-else\n- More concise"
+    },
+    {
+        "input": "result = []\nfor item in items:\n    result.append(item * 2)",
+        "output": "**Simplified Code:**\n```python\nresult = [item * 2 for item in items]\n```\n\n**Improvements:**\n- List comprehension is more Pythonic\n- Single line instead of three\n- Better performance"
+    },
+    {
+        "input": "temp = a\na = b\nb = temp",
+        "output": "**Simplified Code:**\n```python\na, b = b, a\n```\n\n**Improvements:**\n- Python's tuple unpacking\n- No temporary variable needed\n- More elegant"
+    },
+    {
+        "input": "if len(my_list) == 0:\n    print('Empty')",
+        "output": "**Simplified Code:**\n```python\nif not my_list:\n    print('Empty')\n```\n\n**Improvements:**\n- More Pythonic\n- Empty lists are falsy\n- Cleaner syntax"
+    },
+    {
+        "input": "if (a > b) {\n    max = a;\n} else {\n    max = b;\n}",
+        "output": "**Simplified Code:**\n```c\nmax = (a > b) ? a : b;\n```\n\n**Improvements:**\n- Uses ternary operator\n- Single line instead of five\n- Common professional pattern"
+    },
+    {
+        "input": "for (int i = 0; i < vec.size(); i++) {\n    std::cout << vec[i] << std::endl;\n}",
+        "output": "**Simplified Code:**\n```cpp\nfor (const auto& item : vec) {\n    std::cout << item << std::endl;\n}\n```\n\n**Improvements:**\n- Range-based for loop (C++11+)\n- No manual index management\n- Cleaner and safer syntax"
+    },
+    {
+        "input": "<div id=\"header\">\n    <div class=\"nav-links\">\n        <div class=\"link\">Home</div>\n    </div>\n</div>",
+        "output": "**Simplified Code:**\n```html\n<header>\n    <nav>\n        <ul><li>Home</li></ul>\n    </nav>\n</header>\n```\n\n**Improvements:**\n- Uses semantic HTML5 tags\n- Better for SEO and Accessibility\n- Much cleaner structure"
+    }
+]

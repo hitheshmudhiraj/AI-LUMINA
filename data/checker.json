@@ -1,0 +1,26 @@
+[
+    {
+        "input": "def calculate_sum(numbers):\n    total = 0\n    for num in numbers:\n        total += num\n    return total",
+        "output": "**Analysis:** Likely HUMAN-WRITTEN (85% confidence)\n\n**Reasoning:**\n- Uses verbose loop instead of built-in sum()\n- Variable naming is clear but basic\n- Traditional imperative style\n- Common beginner pattern\n\n**Indicators:** Human developers often write explicit loops when learning."
+    },
+    {
+        "input": "def fibonacci(n: int) -> int:\n    \"\"\"Calculate nth Fibonacci number using memoization.\"\"\"\n    memo = {0: 0, 1: 1}\n    def fib(x):\n        if x not in memo:\n            memo[x] = fib(x-1) + fib(x-2)\n        return memo[x]\n    return fib(n)",
+        "output": "**Analysis:** Likely AI-GENERATED (75% confidence)\n\n**Reasoning:**\n- Type hints present\n- Comprehensive docstring\n- Optimal algorithm choice (memoization)\n- Clean nested function structure\n\n**Indicators:** AI tends to include type hints and docstrings consistently."
+    },
+    {
+        "input": "x=5\ny=10\nz=x+y\nprint(z)",
+        "output": "**Analysis:** Likely HUMAN-WRITTEN (90% confidence)\n\n**Reasoning:**\n- No spaces around operators\n- Very basic logic\n- No comments or documentation\n- Beginner-level code\n\n**Indicators:** Inconsistent spacing is common in human-written code."
+    },
+    {
+        "input": "#include <stdlib.h>\nint main() {\n    int *a = malloc(10 * sizeof(int));\n    // process a\n    free(a);\n    return 0;\n}",
+        "output": "**Analysis:** Likely AI-GENERATED (70% confidence)\n\n**Reasoning:**\n- Correct `sizeof` usage\n- Includes `free()` consistently\n- Clean minimal structure\n- No manual byte counting\n\n**Indicators:** AI is very reliable with basic C allocation patterns."
+    },
+    {
+        "input": "void process() {\n    int* data = new int[100];\n    for(int i=0; i<100; i++) data[i] = i;\n    delete[] data;\n}",
+        "output": "**Analysis:** Likely HUMAN-WRITTEN (80% confidence)\n\n**Reasoning:**\n- Manual memory management (raw pointers)\n- No exception safety\n- Missing `std::` prefixes\n- Traditional school-style code\n\n**Indicators:** Humans often use raw 'new'/'delete' in learning exercises."
+    },
+    {
+        "input": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <title>AI Generated Page</title>\n</head>\n<body>\n    <main>\n        <section>\n            <h2>Perfect Content</h2>\n        </section>\n    </main>\n</body>\n</html>",
+        "output": "**Analysis:** Likely AI-GENERATED (85% confidence)\n\n**Reasoning:**\n- Perfect indentation\n- All essential meta tags present\n- Semantic hierarchy (`main` > `section` > `h2`)\n- Standard doc type declaration\n\n**Indicators:** AI consistently generates boilerplate-perfect HTML."
+    }
+]

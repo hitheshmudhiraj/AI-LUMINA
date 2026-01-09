@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Luminators - Login</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="background-overlay"></div>
+
+    <button class="theme-toggle" id="theme-toggle" title="Toggle Light/Dark Mode">
+        <i data-lucide="moon"></i>
+    </button>
+
+    <div class="container">
+        <div class="auth-box">
+            <div class="logo-area">
+                <h1>AI-LUMINA</h1>
+                <p>Gateway to the Future</p>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" class="auth-form active">
+                <h2>Welcome Back</h2>
+                <div class="input-group">
+                    <input type="email" id="login-email" placeholder=" " required>
+                    <label for="login-email">Email Address</label>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="login-password" placeholder=" " required>
+                    <label for="login-password">Password</label>
+                </div>
+
+                <button type="submit" class="btn-primary">Login</button>
+
+                <p class="switch-text">New user? <span id="show-signup">Sign Up</span></p>
+            </form>
+
+            <!-- Signup Form -->
+            <form id="signup-form" class="auth-form">
+                <h2>Create Account</h2>
+                <div class="input-group">
+                    <input type="text" id="signup-name" placeholder=" " required>
+                    <label for="signup-name">Full Name</label>
+                </div>
+                <div class="input-group">
+                    <input type="email" id="signup-email" placeholder=" " required>
+                    <label for="signup-email">Email Address</label>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="signup-password" placeholder=" " required>
+                    <label for="signup-password">Password</label>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="signup-confirm" placeholder=" " required>
+                    <label for="signup-confirm">Confirm Password</label>
+                </div>
+
+                <button type="submit" class="btn-primary">Create Account</button>
+
+                <p class="switch-text">Already have an account? <span id="show-login">Login</span></p>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+    <script src="script.js"></script>
+</body>
+
+</html>

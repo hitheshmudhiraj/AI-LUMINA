@@ -1,0 +1,277 @@
+:root {
+    --primary-color: #6c5ce7;
+    --secondary-color: #a29bfe;
+    --accent-color: #00cec9;
+    --bg-dark: #0f0c29;
+    --bg-gradient: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --text-light: #ffffff;
+    --text-dim: #b2bec3;
+    --font-main: 'Outfit', sans-serif;
+    --container-bg: rgba(255, 255, 255, 0.02);
+}
+
+:root[data-theme="light"] {
+    --bg-dark: #f0f2f5;
+    --bg-gradient: linear-gradient(135deg, #f0f2f5, #e0e0e0, #ffffff);
+    --glass-bg: rgba(0, 0, 0, 0.03);
+    --glass-border: rgba(0, 0, 0, 0.1);
+    --text-light: #1c1e21;
+    --text-dim: #606770;
+    --container-bg: rgba(255, 255, 255, 0.8);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: var(--font-main);
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--bg-dark);
+    color: var(--text-light);
+    overflow: hidden;
+    position: relative;
+}
+
+.background-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('assets/ai-lum-img-1.webp');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.4;
+    z-index: -1;
+    filter: blur(5px);
+}
+
+.container {
+    width: 100%;
+    max-width: 450px;
+    padding: 20px;
+    perspective: 1000px;
+}
+
+.auth-box {
+    background: var(--container-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.auth-box:hover {
+    box-shadow: 0 8px 32px 0 rgba(108, 92, 231, 0.2);
+    border-color: rgba(108, 92, 231, 0.3);
+}
+
+.logo-area {
+    margin-bottom: 30px;
+}
+
+.logo-area h1 {
+    font-size: 2.2rem;
+    background: linear-gradient(to right, #6c5ce7, #00cec9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+}
+
+.logo-area p {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.auth-form {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    transform: translateX(20px);
+}
+
+.auth-form.active {
+    display: block;
+    opacity: 1;
+    transform: translateX(0);
+}
+
+h2 {
+    margin-bottom: 25px;
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    color: var(--text-light);
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.input-group input:focus {
+    border-color: var(--primary-color);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 10px rgba(108, 92, 231, 0.3);
+}
+
+.input-group label {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-dim);
+    pointer-events: none;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    background: transparent;
+    padding: 0 5px;
+}
+
+.input-group input:focus~label,
+.input-group input:not(:placeholder-shown)~label {
+    top: 0;
+    transform: translateY(-50%) scale(0.85);
+    background: var(--bg-dark);
+    /* Fallback if transparent doesn't work well over lines */
+    background: #1a1a2e;
+    /* Matches dark bg approximation */
+    color: var(--accent-color);
+}
+
+/* Fix label background to match glass effect somewhat visually or just be transparent */
+.input-group input:focus~label,
+.input-group input:not(:placeholder-shown)~label {
+    background: transparent;
+    backdrop-filter: blur(5px);
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
+}
+
+.switch-text {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+}
+
+.switch-text span {
+    color: var(--accent-color);
+    cursor: pointer;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.switch-text span:hover {
+    color: var(--text-light);
+    text-decoration: underline;
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 45px;
+    height: 45px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-light);
+    z-index: 1000;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.theme-toggle:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: scale(1.1);
+}
+
+.theme-toggle i {
+    font-size: 1.2rem;
+}
+
+/* Animations */
+@keyframes glow {
+    0% {
+        box-shadow: 0 0 5px var(--primary-color);
+    }
+
+    50% {
+        box-shadow: 0 0 20px var(--primary-color), 0 0 10px var(--accent-color);
+    }
+
+    100% {
+        box-shadow: 0 0 5px var(--primary-color);
+    }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .container {
+        padding: 10px;
+    }
+
+    .auth-box {
+        padding: 30px 20px;
+        margin: 10px;
+    }
+
+    .logo-area h1 {
+        font-size: 1.8rem;
+    }
+}

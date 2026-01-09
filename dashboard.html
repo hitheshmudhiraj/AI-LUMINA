@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Luminators - Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="debugger.css">
+    <link rel="stylesheet" href="simplifier.css">
+    <link rel="stylesheet" href="chatbot.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+    <div class="background-glow"></div>
+    <div class="background-glow second"></div>
+
+    <nav class="top-nav">
+        <div class="nav-left">
+            <span class="logo">AI-LUMINA</span>
+        </div>
+        <div class="nav-center">
+            <a href="#" class="nav-link active" data-feature="dashboard">
+                <i data-lucide="layout-dashboard"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-link" data-feature="debugger">
+                <i data-lucide="bug"></i>
+                <span>Debugger</span>
+            </a>
+            <a href="#" class="nav-link" data-feature="simplifier">
+                <i data-lucide="sparkles"></i>
+                <span>Simplifier</span>
+            </a>
+            <a href="#" class="nav-link" data-feature="checker">
+                <i data-lucide="check-circle"></i>
+                <span>Checker</span>
+            </a>
+        </div>
+        <div class="nav-right">
+            <button class="theme-toggle-btn" id="theme-toggle" title="Toggle Light/Dark Mode">
+                <i data-lucide="moon"></i>
+            </button>
+            <div class="profile-container">
+                <div class="profile-icon" id="profile-icon">
+                    <i data-lucide="user"></i>
+                </div>
+                <div class="tooltip" id="profile-tooltip">
+                    <div class="user-info">
+                        <p class="user-name" id="tooltip-name">User Name</p>
+                        <p class="user-email" id="tooltip-email">user@example.com</p>
+                    </div>
+                    <hr>
+                    <button id="logout-btn" class="logout-link">
+                        <i data-lucide="log-out"></i>
+                        <span>Logout</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="dashboard-container">
+        <header class="welcome-section">
+            <h1 id="welcome-msg">Welcome, <span id="display-name">Guest</span>! Explore AI-powered code tools.</h1>
+            <p class="subtitle">Select a tool to enhance your coding workflow.</p>
+        </header>
+
+        <section class="selection-area" id="main-dashboard">
+            <h2 class="section-title">Choose One</h2>
+            <div class="feature-grid">
+                <div class="feature-card" data-feature="debugger">
+                    <div class="card-icon blue">
+                        <i data-lucide="bug"></i>
+                    </div>
+                    <h3>Debugger</h3>
+                    <p>Identify and fix bugs in your code effortlessly with AI assistance.</p>
+                    <button class="card-action">Launch Debugger</button>
+                </div>
+
+                <div class="feature-card" data-feature="simplifier">
+                    <div class="card-icon purple">
+                        <i data-lucide="sparkles"></i>
+                    </div>
+                    <h3>Simplifier</h3>
+                    <p>Make complex code readable and easier to understand in seconds.</p>
+                    <button class="card-action">Simplify Code</button>
+                </div>
+
+                <div class="feature-card" data-feature="checker">
+                    <div class="card-icon green">
+                        <i data-lucide="check-circle"></i>
+                    </div>
+                    <h3>Checker</h3>
+                    <p>Analyze code quality and security risks before you deploy.</p>
+                    <button class="card-action">Start Check</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Debugger Section -->
+        <section id="debugger-section" class="module-section" style="display: none;">
+            <div class="module-layout">
+                <aside class="module-sidebar" id="debugger-history">
+                    <div class="sidebar-header">
+                        <h3>History</h3>
+                        <button class="clear-history-btn" id="clear-debugger-history"><i
+                                data-lucide="trash-2"></i></button>
+                    </div>
+                    <div class="history-list" id="debugger-history-list">
+                        <p class="empty-state">No recent sessions</p>
+                    </div>
+                </aside>
+
+                <div class="module-content">
+                    <div class="chat-container">
+                        <div class="chat-header">
+                            <h2>
+                                <div class="module-icon debugger">
+                                    <i data-lucide="bug"></i>
+                                </div>
+                                Code Debugger
+                            </h2>
+                        </div>
+
+                        <div class="messages-area" id="debugger-messages">
+                            <div class="empty-chat-state">
+                                <div class="empty-chat-icon">
+                                    <i data-lucide="bug"></i>
+                                </div>
+                                <h3>AI-Powered Code Debugger</h3>
+                                <p>Paste your code or describe the issue, and I'll help you find and fix bugs in any
+                                    programming language.</p>
+                                <div class="suggestion-chips">
+                                    <div class="suggestion-chip"
+                                        data-suggestion="Debug this Python code: def add(a,b) return a+b">
+                                        Fix syntax error
+                                    </div>
+                                    <div class="suggestion-chip"
+                                        data-suggestion="Why is my code throwing a null pointer exception?">
+                                        Explain error
+                                    </div>
+                                    <div class="suggestion-chip" data-suggestion="Find bugs in my JavaScript function">
+                                        Find bugs
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chat-input-area">
+                            <div class="input-wrapper">
+                                <button class="input-icon-btn" id="debugger-image-upload"
+                                    title="Upload code screenshot">
+                                    <i data-lucide="image"></i>
+                                </button>
+                                <input type="file" id="debugger-image-input" accept="image/*" style="display: none;">
+
+                                <textarea id="debugger-chat-input" placeholder="Paste your code or describe the bug..."
+                                    rows="1"></textarea>
+
+                                <button class="input-icon-btn" id="debugger-voice-input" title="Voice input">
+                                    <i data-lucide="mic"></i>
+                                </button>
+
+                                <button class="send-btn" id="debugger-send-btn">
+                                    <i data-lucide="send"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Simplifier Section -->
+        <section id="simplifier-section" class="module-section" style="display: none;">
+            <div class="module-layout">
+                <aside class="module-sidebar" id="simplifier-history">
+                    <div class="sidebar-header">
+                        <h3>History</h3>
+                        <button class="clear-history-btn" id="clear-simplifier-history"><i
+                                data-lucide="trash-2"></i></button>
+                    </div>
+                    <div class="history-list" id="simplifier-history-list">
+                        <p class="empty-state">No recent simplifications</p>
+                    </div>
+                </aside>
+
+                <div class="module-content">
+                    <div class="chat-container">
+                        <div class="chat-header">
+                            <h2>
+                                <div class="module-icon simplifier">
+                                    <i data-lucide="sparkles"></i>
+                                </div>
+                                Code Simplifier
+                            </h2>
+                        </div>
+
+                        <div class="messages-area" id="simplifier-messages">
+                            <div class="empty-chat-state">
+                                <div class="empty-chat-icon">
+                                    <i data-lucide="sparkles"></i>
+                                </div>
+                                <h3>AI-Powered Code Simplifier</h3>
+                                <p>Share complex code and I'll refactor it to be cleaner, more readable, and
+                                    maintainable.</p>
+                                <div class="suggestion-chips">
+                                    <div class="suggestion-chip" data-suggestion="Simplify this nested loop code">
+                                        Simplify loops
+                                    </div>
+                                    <div class="suggestion-chip"
+                                        data-suggestion="Refactor this code to use better variable names">
+                                        Better naming
+                                    </div>
+                                    <div class="suggestion-chip" data-suggestion="Make this code more readable">
+                                        Improve readability
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chat-input-area">
+                            <div class="input-wrapper">
+                                <button class="input-icon-btn" id="simplifier-image-upload"
+                                    title="Upload code screenshot">
+                                    <i data-lucide="image"></i>
+                                </button>
+                                <input type="file" id="simplifier-image-input" accept="image/*" style="display: none;">
+
+                                <textarea id="simplifier-chat-input" placeholder="Paste your code to simplify..."
+                                    rows="1"></textarea>
+
+                                <button class="input-icon-btn" id="simplifier-voice-input" title="Voice input">
+                                    <i data-lucide="mic"></i>
+                                </button>
+
+                                <button class="send-btn" id="simplifier-send-btn">
+                                    <i data-lucide="send"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Checker Section -->
+        <section id="checker-section" class="module-section" style="display: none;">
+            <div class="module-layout">
+                <aside class="module-sidebar" id="checker-history">
+                    <div class="sidebar-header">
+                        <h3>History</h3>
+                        <button class="clear-history-btn" id="clear-checker-history"><i
+                                data-lucide="trash-2"></i></button>
+                    </div>
+                    <div class="history-list" id="checker-history-list">
+                        <p class="empty-state">No recent checks</p>
+                    </div>
+                </aside>
+
+                <div class="module-content">
+                    <div class="chat-container">
+                        <div class="chat-header">
+                            <h2>
+                                <div class="module-icon checker">
+                                    <i data-lucide="check-circle"></i>
+                                </div>
+                                Code Checker
+                            </h2>
+                        </div>
+
+                        <div class="messages-area" id="checker-messages">
+                            <div class="empty-chat-state">
+                                <div class="empty-chat-icon">
+                                    <i data-lucide="check-circle"></i>
+                                </div>
+                                <h3>AI vs Human Code Detector</h3>
+                                <p>Submit code and I'll analyze whether it was written by AI or a human developer.</p>
+                                <div class="suggestion-chips">
+                                    <div class="suggestion-chip" data-suggestion="Check if this code is AI-generated">
+                                        Detect AI code
+                                    </div>
+                                    <div class="suggestion-chip" data-suggestion="Analyze code authenticity">
+                                        Check authenticity
+                                    </div>
+                                    <div class="suggestion-chip" data-suggestion="Is this human-written code?">
+                                        Verify origin
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chat-input-area">
+                            <div class="input-wrapper">
+                                <button class="input-icon-btn" id="checker-image-upload" title="Upload code screenshot">
+                                    <i data-lucide="image"></i>
+                                </button>
+                                <input type="file" id="checker-image-input" accept="image/*" style="display: none;">
+
+                                <textarea id="checker-chat-input" placeholder="Paste code to check..."
+                                    rows="1"></textarea>
+
+                                <button class="input-icon-btn" id="checker-voice-input" title="Voice input">
+                                    <i data-lucide="mic"></i>
+                                </button>
+
+                                <button class="send-btn" id="checker-send-btn">
+                                    <i data-lucide="send"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="dashboard.js"></script>
+    <script src="debugger.js"></script>
+    <script src="simplifier.js"></script>
+    <script src="checker.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,362 @@
+// Debugger Chatbot Module
+document.addEventListener('DOMContentLoaded', () => {
+    const messagesArea = document.getElementById('debugger-messages');
+    const chatInput = document.getElementById('debugger-chat-input');
+    const sendBtn = document.getElementById('debugger-send-btn');
+    const voiceBtn = document.getElementById('debugger-voice-input');
+    const imageUploadBtn = document.getElementById('debugger-image-upload');
+    const imageInput = document.getElementById('debugger-image-input');
+    const historyList = document.getElementById('debugger-history-list');
+    const clearHistoryBtn = document.getElementById('clear-debugger-history');
+
+    let isProcessing = false;
+    let recognition = null;
+
+    // Initialize speech recognition if available
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            chatInput.value = transcript;
+            chatInput.style.height = 'auto';
+            chatInput.style.height = chatInput.scrollHeight + 'px';
+        };
+
+        recognition.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
+            voiceBtn.style.color = '';
+        };
+
+        recognition.onend = () => {
+            voiceBtn.style.color = '';
+        };
+    } else {
+        voiceBtn.style.display = 'none';
+    }
+
+    // Auto-resize textarea
+    chatInput.addEventListener('input', () => {
+        chatInput.style.height = 'auto';
+        chatInput.style.height = Math.min(chatInput.scrollHeight, 150) + 'px';
+    });
+
+    // Handle Keyboard Behavior
+    chatInput.addEventListener('keydown', (e) => {
+        // Submit on Right Arrow key (as requested) or Ctrl+Enter
+        if ((e.key === 'ArrowRight' && !e.shiftKey) || (e.key === 'Enter' && e.ctrlKey)) {
+            e.preventDefault();
+            sendMessage();
+        }
+        // Standard Enter adds a newline (default behavior for textarea)
+        // We don't need to preventDefault here anymore for Enter
+    });
+
+    // Send button click
+    sendBtn.addEventListener('click', sendMessage);
+
+    // Voice input
+    voiceBtn.addEventListener('click', () => {
+        if (recognition) {
+            voiceBtn.style.color = '#3b82f6';
+            recognition.start();
+        }
+    });
+
+    // Image upload
+    imageUploadBtn.addEventListener('click', () => {
+        imageInput.click();
+    });
+
+    imageInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            // For now, just notify that image upload is not yet implemented
+            addMessage('user', `[Image uploaded: ${file.name}]\n\nNote: Image processing will be implemented with OCR in the next update.`);
+        }
+    });
+
+    // Suggestion chips
+    document.querySelectorAll('#debugger-messages .suggestion-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            const suggestion = chip.getAttribute('data-suggestion');
+            chatInput.value = suggestion;
+            sendMessage();
+        });
+    });
+
+    // Clear history
+    clearHistoryBtn.addEventListener('click', () => {
+        localStorage.removeItem('debugger_history');
+        renderHistory();
+    });
+
+    async function sendMessage() {
+        const message = chatInput.value.trim();
+        if (!message || isProcessing) return;
+
+        // Clear empty state
+        const emptyState = messagesArea.querySelector('.empty-chat-state');
+        if (emptyState) {
+            emptyState.remove();
+        }
+
+        // Add user message
+        addMessage('user', message);
+        chatInput.value = '';
+        chatInput.style.height = 'auto';
+
+        // Show typing indicator
+        const typingId = addTypingIndicator();
+
+        // Disable input
+        isProcessing = true;
+        sendBtn.disabled = true;
+
+        try {
+            const response = await fetch('http://localhost:5000/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: message,
+                    module: 'debugger'
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Backend request failed');
+            }
+
+            const data = await response.json();
+
+            // Remove typing indicator
+            removeTypingIndicator(typingId);
+
+            // Add AI response
+            addMessage('ai', data.response);
+
+            // Save to history
+            saveToHistory(message);
+
+        } catch (error) {
+            console.warn('Backend Error, falling back to sample data:', error);
+
+            // Try to find a sample response
+            const sampleResponse = findSampleResponse(message);
+
+            // Artificial delay to simulate "thinking"
+            setTimeout(() => {
+                removeTypingIndicator(typingId);
+
+                if (sampleResponse) {
+                    addMessage('ai', sampleResponse);
+                    saveToHistory(message);
+                } else {
+                    addMessage('ai', '❌ Sorry, I couldn\'t connect to the backend and no sample data was found. Make sure the server is running.\n\nError: ' + error.message);
+                }
+            }, 1000);
+        } finally {
+            isProcessing = false;
+            sendBtn.disabled = false;
+        }
+    }
+
+    function addMessage(type, content) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${type}`;
+
+        const avatar = document.createElement('div');
+        avatar.className = 'message-avatar';
+        avatar.innerHTML = type === 'user' ? '👤' : '🤖';
+
+        const messageContent = document.createElement('div');
+        messageContent.className = 'message-content';
+
+        const messageText = document.createElement('div');
+        messageText.className = 'message-text';
+
+        // Format code blocks
+        const formattedContent = formatMessageContent(content);
+        messageText.innerHTML = formattedContent;
+
+        const timestamp = document.createElement('span');
+        timestamp.className = 'message-timestamp';
+        timestamp.textContent = new Date().toLocaleTimeString();
+
+        messageContent.appendChild(messageText);
+        messageContent.appendChild(timestamp);
+
+        messageDiv.appendChild(avatar);
+        messageDiv.appendChild(messageContent);
+
+        messagesArea.appendChild(messageDiv);
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+
+        // Reinitialize Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    }
+
+    function formatMessageContent(content) {
+        // First convert any literal \n strings to real newlines
+        let formatted = content.replace(/\\n/g, '\n');
+
+        // Multi-line code blocks (```language\ncode\n```)
+        formatted = formatted.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
+            return `<pre><code>${escapeHtml(code.trim())}</code></pre>`;
+        });
+
+        // Inline code (`code`)
+        formatted = formatted.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+        // Bold text (**text**)
+        formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+        // Convert newlines to <br> (but not inside <pre> tags)
+        const parts = formatted.split(/(<pre>[\s\S]*?<\/pre>)/);
+        formatted = parts.map((part, index) => {
+            if (index % 2 === 0) {
+                return part.replace(/\n/g, '<br>');
+            }
+            return part;
+        }).join('');
+
+        return formatted;
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function addTypingIndicator() {
+        const typingId = 'typing-' + Date.now();
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message ai';
+        messageDiv.id = typingId;
+
+        const avatar = document.createElement('div');
+        avatar.className = 'message-avatar';
+        avatar.innerHTML = '🤖';
+
+        const messageContent = document.createElement('div');
+        messageContent.className = 'message-content';
+
+        const typingIndicator = document.createElement('div');
+        typingIndicator.className = 'typing-indicator';
+        typingIndicator.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+
+        messageContent.appendChild(typingIndicator);
+        messageDiv.appendChild(avatar);
+        messageDiv.appendChild(messageContent);
+
+        messagesArea.appendChild(messageDiv);
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+
+        return typingId;
+    }
+
+    function removeTypingIndicator(typingId) {
+        const typingElement = document.getElementById(typingId);
+        if (typingElement) {
+            typingElement.remove();
+        }
+    }
+
+    function saveToHistory(message) {
+        const history = JSON.parse(localStorage.getItem('debugger_history') || '[]');
+        const entry = {
+            id: Date.now(),
+            message: message.substring(0, 50),
+            time: new Date().toLocaleTimeString()
+        };
+        history.unshift(entry);
+        localStorage.setItem('debugger_history', JSON.stringify(history.slice(0, 10)));
+        renderHistory();
+    }
+
+    function renderHistory() {
+        const history = JSON.parse(localStorage.getItem('debugger_history') || '[]');
+        if (history.length === 0) {
+            historyList.innerHTML = '<p class="empty-state">No recent sessions</p>';
+            return;
+        }
+
+        historyList.innerHTML = history.map(item => `
+            <div class="history-item" data-id="${item.id}">
+                <span class="time">${item.time}</span>
+                <div class="snippet">${item.message}...</div>
+            </div>
+        `).join('');
+
+        // Add click handlers
+        document.querySelectorAll('#debugger-history .history-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const id = item.getAttribute('data-id');
+                const history = JSON.parse(localStorage.getItem('debugger_history') || '[]');
+                const selected = history.find(h => h.id == id);
+                if (selected) {
+                    chatInput.value = selected.message;
+                }
+            });
+        });
+    }
+
+    let debuggerData = [];
+
+    // Load debugger data
+    async function loadDebuggerData() {
+        try {
+            const response = await fetch('data/debugger.json');
+            debuggerData = await response.json();
+        } catch (error) {
+            console.error('Error loading debugger data:', error);
+        }
+    }
+
+    function findSampleResponse(userMessage) {
+        if (!debuggerData || debuggerData.length === 0) {
+            return null;
+        }
+
+        const samples = debuggerData;
+
+        // Normalize helper: remove all whitespace and convert to lowercase
+        const normalize = (str) => str.toLowerCase().replace(/\s+/g, '').trim();
+
+        const normalizedInput = normalize(userMessage);
+
+        // 1. Try exact match after normalization
+        for (let sample of samples) {
+            if (normalize(sample.question) === normalizedInput) {
+                return sample.answer;
+            }
+        }
+
+        // 2. Try partial match: if input contains normalized sample or vice versa
+        for (let sample of samples) {
+            const normalizedSample = normalize(sample.question);
+            if (normalizedInput.includes(normalizedSample) || normalizedSample.includes(normalizedInput)) {
+                // Only return if at least 20 chars match to avoid false positives with very short snippets
+                if (normalizedSample.length > 20 || normalizedInput.length > 20) {
+                    return sample.answer;
+                }
+            }
+        }
+
+        // 3. Match not found
+        console.log('No debugger match found for:', userMessage.substring(0, 50));
+        return `❌ **Invalid Question**\n\nThis specific program or error was not found in our offline sample database.\n\nPlease provide a clear Python code snippet from the common examples.`;
+    }
+
+    // Initial render
+    loadDebuggerData();
+    renderHistory();
+});

@@ -1,0 +1,92 @@
+/* Simplifier Module Styles */
+.purple-btn {
+    background: linear-gradient(90deg, var(--accent-purple), #6366f1) !important;
+}
+
+.purple-btn:hover {
+    box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4) !important;
+}
+
+.results-header h2 {
+    background: linear-gradient(90deg, var(--accent-purple), #6366f1);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.card-header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.card-header-actions h3 {
+    margin-bottom: 0 !important;
+}
+
+.icon-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.icon-btn:hover {
+    color: var(--text-primary);
+}
+
+.variable-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.variable-item:last-child {
+    border-bottom: none;
+}
+
+.old-name {
+    font-family: monospace;
+    color: #ef4444;
+    text-decoration: line-through;
+}
+
+.new-name {
+    font-family: monospace;
+    color: #10b981;
+    font-weight: 600;
+}
+
+.arrow {
+    color: var(--text-secondary);
+}
+
+.reason-item {
+    position: relative;
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.reason-item::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--accent-purple);
+}
+
+/* Specific adjustments for simplifier highlighting */
+#simplifier-highlighting .hljs-keyword {
+    color: #8b5cf6;
+}
+
+#simplifier-highlighting .hljs-string {
+    color: #10b981;
+}
+
+#simplifier-highlighting .hljs-comment {
+    color: #6b7280;
+}
