@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import google.generativeai as genai
 import os
@@ -77,10 +77,20 @@ Format your response in a clear, conversational way."""
             "error": f"Failed to generate response: {str(e)}"
         }), 500
 
-@app.route('/health', methods=['GET'])
-def health():
-    """Health check endpoint"""
-    return jsonify({"status": "ok", "gemini_configured": GEMINI_API_KEY != 'YOUR_API_KEY_HERE'})
+@app.route('/')
+def index():
+    """Serve the root index.html"""
+    return send_from_directory('.', 'index.html')
+
+@app.route('/dashboard')
+def dashboard():
+    """Serve the dashboard.html"""
+    return send_from_directory('.', 'dashboard.html')
+
+@app.route('/<path:path>')
+def serve_static(path):
+    """Serve static files (css, js, assets, data)"""
+    return send_from_directory('.', path)
 
 if __name__ == '__main__':
     print("=" * 60)
