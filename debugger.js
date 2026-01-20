@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const imageUploadBtn = document.getElementById('debugger-image-upload');
     const imageInput = document.getElementById('debugger-image-input');
     const historyList = document.getElementById('debugger-history-list');
-    const clearHistoryBtn = document.getElementById('clear-debugger-history');
+    // const clearHistoryBtn = document.getElementById('clear-debugger-history');
     const newPageBtn = document.getElementById('new-debugger-page');
 
     // Store the initial empty state HTML
@@ -118,11 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Clear history
-    clearHistoryBtn.addEventListener('click', () => {
-        localStorage.removeItem('debugger_history');
-        renderHistory();
-    });
+    // clearHistoryBtn removed
 
     async function sendMessage() {
         const message = chatInput.value.trim();
@@ -313,9 +309,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Clear history logic removed
+
     function renderHistory() {
-        db.collection("debugger_history").orderBy("timestamp", "desc").limit(20)
+        db.collection("debugger_history").orderBy("timestamp", "desc").limit(50)
             .onSnapshot((querySnapshot) => {
+                const historyList = document.getElementById('debugger-history-list'); // Ensure selector
                 if (querySnapshot.empty) {
                     historyList.innerHTML = '<p class="empty-state">No recent sessions</p>';
                     return;
@@ -324,21 +323,49 @@ document.addEventListener('DOMContentLoaded', () => {
                 let html = '';
                 querySnapshot.forEach((doc) => {
                     const item = doc.data();
+                    const id = doc.id;
                     html += `
-                        <div class="history-item" data-full-message="${item.fullMessage.replace(/"/g, '&quot;')}">
-                            <span class="time">${item.time}</span>
-                            <div class="snippet">${item.message}...</div>
+                        <div class="history-item" data-id="${id}" data-full-message="${item.fullMessage.replace(/"/g, '&quot;')}">
+                            <div class="history-content">
+                                <span class="time">${item.time}</span>
+                                <div class="snippet">${item.message}...</div>
+                            </div>
+                            <button class="delete-item-btn" title="Delete" data-delete-id="${id}">
+                                <i data-lucide="trash-2"></i>
+                            </button>
                         </div>
                     `;
                 });
                 historyList.innerHTML = html;
 
-                // Add click handlers
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+
+                // Add click handlers for items
                 document.querySelectorAll('#debugger-history .history-item').forEach(item => {
-                    item.addEventListener('click', () => {
+                    item.addEventListener('click', (e) => {
+                        // If clicked target is inside delete button, do nothing (handled by delete btn listener)
+                        if (e.target.closest('.delete-item-btn')) return;
+
                         const fullMessage = item.getAttribute('data-full-message');
                         if (fullMessage) {
                             chatInput.value = fullMessage;
+                        }
+                    });
+                });
+
+                // Add click handlers for delete buttons
+                document.querySelectorAll('#debugger-history .delete-item-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        e.stopPropagation(); // Stop bubbling to item click
+                        const id = btn.getAttribute('data-delete-id');
+                        if (confirm('Delete this history item?')) {
+                            try {
+                                await db.collection("debugger_history").doc(id).delete();
+                            } catch (error) {
+                                console.error("Error removing document: ", error);
+                            }
                         }
                     });
                 });

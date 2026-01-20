@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const imageUploadBtn = document.getElementById('simplifier-image-upload');
     const imageInput = document.getElementById('simplifier-image-input');
     const historyList = document.getElementById('simplifier-history-list');
-    const clearHistoryBtn = document.getElementById('clear-simplifier-history');
+    // const clearHistoryBtn = document.getElementById('clear-simplifier-history');
     const newPageBtn = document.getElementById('new-simplifier-page');
 
     // Store initial empty state HTML
@@ -109,10 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    clearHistoryBtn.addEventListener('click', () => {
-        localStorage.removeItem('simplifier_history');
-        renderHistory();
-    });
+    // clearHistoryBtn removed
 
     async function sendMessage() {
         const message = chatInput.value.trim();
@@ -395,9 +392,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Clear history logic removed
+
     function renderHistory() {
-        db.collection("simplifier_history").orderBy("timestamp", "desc").limit(20)
+        db.collection("simplifier_history").orderBy("timestamp", "desc").limit(50)
             .onSnapshot((querySnapshot) => {
+                const historyList = document.getElementById('simplifier-history-list');
                 if (querySnapshot.empty) {
                     historyList.innerHTML = '<p class="empty-state">No recent simplifications</p>';
                     return;
@@ -406,20 +406,46 @@ document.addEventListener('DOMContentLoaded', () => {
                 let html = '';
                 querySnapshot.forEach((doc) => {
                     const item = doc.data();
+                    const id = doc.id;
                     html += `
-                    <div class="history-item" data-full-message="${item.fullMessage.replace(/"/g, '&quot;')}">
-                        <span class="time">${item.time}</span>
-                        <div class="snippet">${item.message}...</div>
+                    <div class="history-item" data-id="${id}" data-full-message="${item.fullMessage.replace(/"/g, '&quot;')}">
+                        <div class="history-content">
+                            <span class="time">${item.time}</span>
+                            <div class="snippet">${item.message}...</div>
+                        </div>
+                        <button class="delete-item-btn" title="Delete" data-delete-id="${id}">
+                            <i data-lucide="trash-2"></i>
+                        </button>
                     </div>
                 `;
                 });
                 historyList.innerHTML = html;
 
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+
                 document.querySelectorAll('#simplifier-history .history-item').forEach(item => {
-                    item.addEventListener('click', () => {
+                    item.addEventListener('click', (e) => {
+                        if (e.target.closest('.delete-item-btn')) return;
+
                         const fullMessage = item.getAttribute('data-full-message');
                         if (fullMessage) {
                             chatInput.value = fullMessage;
+                        }
+                    });
+                });
+
+                document.querySelectorAll('#simplifier-history .delete-item-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        const id = btn.getAttribute('data-delete-id');
+                        if (confirm('Delete this item?')) {
+                            try {
+                                await db.collection("simplifier_history").doc(id).delete();
+                            } catch (error) {
+                                console.error("Error removing document: ", error);
+                            }
                         }
                     });
                 });

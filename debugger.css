@@ -54,13 +54,47 @@
 }
 
 .history-item {
-    padding: 1rem;
+    padding: 0.8rem 1rem;
     border-radius: 12px;
     background: var(--glass-bg);
     margin-bottom: 0.8rem;
     cursor: pointer;
     transition: all 0.2s;
     border: 1px solid transparent;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.history-content {
+    flex: 1;
+    overflow: hidden;
+}
+
+.delete-item-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    opacity: 0.6;
+}
+
+.delete-item-btn:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+    opacity: 1;
+}
+
+.delete-item-btn i {
+    width: 16px;
+    height: 16px;
 }
 
 .history-item:hover {

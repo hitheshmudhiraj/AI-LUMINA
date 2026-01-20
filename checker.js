@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const imageUploadBtn = document.getElementById('checker-image-upload');
     const imageInput = document.getElementById('checker-image-input');
     const historyList = document.getElementById('checker-history-list');
-    const clearHistoryBtn = document.getElementById('clear-checker-history');
+    // const clearHistoryBtn = document.getElementById('clear-checker-history');
     const newPageBtn = document.getElementById('new-evaluator-page');
 
     // Store initial empty state HTML
@@ -109,10 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    clearHistoryBtn.addEventListener('click', () => {
-        localStorage.removeItem('evaluator_history');
-        renderHistory();
-    });
+    // clearHistoryBtn removed
 
     async function sendMessage() {
         const message = chatInput.value.trim();
@@ -396,9 +393,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Clear history logic removed
+
     function renderHistory() {
-        db.collection("evaluator_history").orderBy("timestamp", "desc").limit(20)
+        db.collection("evaluator_history").orderBy("timestamp", "desc").limit(50)
             .onSnapshot((querySnapshot) => {
+                const historyList = document.getElementById('checker-history-list');
                 if (querySnapshot.empty) {
                     historyList.innerHTML = '<p class="empty-state">No recent checks</p>';
                     return;
@@ -407,20 +407,46 @@ document.addEventListener('DOMContentLoaded', () => {
                 let html = '';
                 querySnapshot.forEach((doc) => {
                     const item = doc.data();
+                    const id = doc.id;
                     html += `
-                        <div class="history-item" data-full-message="${item.fullMessage.replace(/"/g, '&quot;')}">
-                            <span class="time">${item.time}</span>
-                            <div class="snippet">${item.message}...</div>
+                        <div class="history-item" data-id="${id}" data-full-message="${item.fullMessage.replace(/"/g, '&quot;')}">
+                            <div class="history-content">
+                                <span class="time">${item.time}</span>
+                                <div class="snippet">${item.message}...</div>
+                            </div>
+                            <button class="delete-item-btn" title="Delete" data-delete-id="${id}">
+                                <i data-lucide="trash-2"></i>
+                            </button>
                         </div>
                     `;
                 });
                 historyList.innerHTML = html;
 
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+
                 document.querySelectorAll('#checker-history .history-item').forEach(item => {
-                    item.addEventListener('click', () => {
+                    item.addEventListener('click', (e) => {
+                        if (e.target.closest('.delete-item-btn')) return;
+
                         const fullMessage = item.getAttribute('data-full-message');
                         if (fullMessage) {
                             chatInput.value = fullMessage;
+                        }
+                    });
+                });
+
+                document.querySelectorAll('#checker-history .delete-item-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        const id = btn.getAttribute('data-delete-id');
+                        if (confirm('Delete this item?')) {
+                            try {
+                                await db.collection("evaluator_history").doc(id).delete();
+                            } catch (error) {
+                                console.error("Error removing document: ", error);
+                            }
                         }
                     });
                 });
