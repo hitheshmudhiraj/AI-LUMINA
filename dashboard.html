@@ -13,6 +13,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics-compat.js"></script>
 </head>
 
 <body>
@@ -22,24 +26,6 @@
     <nav class="top-nav">
         <div class="nav-left">
             <span class="logo">AI-LUMINA</span>
-        </div>
-        <div class="nav-center">
-            <a href="#" class="nav-link active" data-feature="dashboard">
-                <i data-lucide="layout-dashboard"></i>
-                <span>Dashboard</span>
-            </a>
-            <a href="#" class="nav-link" data-feature="debugger">
-                <i data-lucide="bug"></i>
-                <span>Debugger</span>
-            </a>
-            <a href="#" class="nav-link" data-feature="simplifier">
-                <i data-lucide="sparkles"></i>
-                <span>Simplifier</span>
-            </a>
-            <a href="#" class="nav-link" data-feature="checker">
-                <i data-lucide="check-circle"></i>
-                <span>Checker</span>
-            </a>
         </div>
         <div class="nav-right">
             <button class="theme-toggle-btn" id="theme-toggle" title="Toggle Light/Dark Mode">
@@ -95,9 +81,9 @@
                     <div class="card-icon green">
                         <i data-lucide="check-circle"></i>
                     </div>
-                    <h3>Checker</h3>
+                    <h3>Evaluator</h3>
                     <p>Analyze code quality and security risks before you deploy.</p>
-                    <button class="card-action">Start Check</button>
+                    <button class="card-action">Start Evaluation</button>
                 </div>
             </div>
         </section>
@@ -107,7 +93,13 @@
             <div class="module-layout">
                 <aside class="module-sidebar" id="debugger-history">
                     <div class="sidebar-header">
-                        <h3>History</h3>
+                        <div class="sidebar-title-area">
+                            <h3>History</h3>
+                            <button class="new-page-btn" id="new-debugger-page" title="New Session">
+                                <i data-lucide="plus-circle"></i>
+                                <span>New Page</span>
+                            </button>
+                        </div>
                         <button class="clear-history-btn" id="clear-debugger-history"><i
                                 data-lucide="trash-2"></i></button>
                     </div>
@@ -125,6 +117,10 @@
                                 </div>
                                 Code Debugger
                             </h2>
+                            <button class="back-to-dashboard" title="Back to Dashboard">
+                                <i data-lucide="arrow-left"></i>
+                                <span>Exit</span>
+                            </button>
                         </div>
 
                         <div class="messages-area" id="debugger-messages">
@@ -180,7 +176,13 @@
             <div class="module-layout">
                 <aside class="module-sidebar" id="simplifier-history">
                     <div class="sidebar-header">
-                        <h3>History</h3>
+                        <div class="sidebar-title-area">
+                            <h3>History</h3>
+                            <button class="new-page-btn" id="new-simplifier-page" title="New Session">
+                                <i data-lucide="plus-circle"></i>
+                                <span>New Page</span>
+                            </button>
+                        </div>
                         <button class="clear-history-btn" id="clear-simplifier-history"><i
                                 data-lucide="trash-2"></i></button>
                     </div>
@@ -198,6 +200,10 @@
                                 </div>
                                 Code Simplifier
                             </h2>
+                            <button class="back-to-dashboard" title="Back to Dashboard">
+                                <i data-lucide="arrow-left"></i>
+                                <span>Exit</span>
+                            </button>
                         </div>
 
                         <div class="messages-area" id="simplifier-messages">
@@ -253,7 +259,13 @@
             <div class="module-layout">
                 <aside class="module-sidebar" id="checker-history">
                     <div class="sidebar-header">
-                        <h3>History</h3>
+                        <div class="sidebar-title-area">
+                            <h3>History</h3>
+                            <button class="new-page-btn" id="new-evaluator-page" title="New Session">
+                                <i data-lucide="plus-circle"></i>
+                                <span>New Page</span>
+                            </button>
+                        </div>
                         <button class="clear-history-btn" id="clear-checker-history"><i
                                 data-lucide="trash-2"></i></button>
                     </div>
@@ -269,8 +281,12 @@
                                 <div class="module-icon checker">
                                     <i data-lucide="check-circle"></i>
                                 </div>
-                                Code Checker
+                                Code Evaluator
                             </h2>
+                            <button class="back-to-dashboard" title="Back to Dashboard">
+                                <i data-lucide="arrow-left"></i>
+                                <span>Exit</span>
+                            </button>
                         </div>
 
                         <div class="messages-area" id="checker-messages">
@@ -301,7 +317,7 @@
                                 </button>
                                 <input type="file" id="checker-image-input" accept="image/*" style="display: none;">
 
-                                <textarea id="checker-chat-input" placeholder="Paste code to check..."
+                                <textarea id="checker-chat-input" placeholder="Paste code to evaluate..."
                                     rows="1"></textarea>
 
                                 <button class="input-icon-btn" id="checker-voice-input" title="Voice input">
@@ -319,6 +335,7 @@
         </section>
     </main>
 
+    <script src="firebase-config.js"></script>
     <script src="dashboard.js"></script>
     <script src="debugger.js"></script>
     <script src="simplifier.js"></script>

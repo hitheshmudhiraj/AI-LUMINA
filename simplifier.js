@@ -1,4 +1,7 @@
 // Simplifier Chatbot Module
+// Helper for Firestore
+// const { collection, addDoc, onSnapshot, query, orderBy, limit } = firebase.firestore;
+
 document.addEventListener('DOMContentLoaded', () => {
     const messagesArea = document.getElementById('simplifier-messages');
     const chatInput = document.getElementById('simplifier-chat-input');
@@ -8,6 +11,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const imageInput = document.getElementById('simplifier-image-input');
     const historyList = document.getElementById('simplifier-history-list');
     const clearHistoryBtn = document.getElementById('clear-simplifier-history');
+    const newPageBtn = document.getElementById('new-simplifier-page');
+
+    // Store initial empty state HTML
+    const emptyChatStateHTML = messagesArea.innerHTML;
 
     let isProcessing = false;
     let recognition = null;
@@ -74,14 +81,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Suggestion chips
-    document.querySelectorAll('#simplifier-messages .suggestion-chip').forEach(chip => {
-        chip.addEventListener('click', () => {
-            const suggestion = chip.getAttribute('data-suggestion');
-            chatInput.value = suggestion;
-            sendMessage();
+    // Suggestion chips initialization
+    function initSuggestionChips() {
+        document.querySelectorAll('#simplifier-messages .suggestion-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                const suggestion = chip.getAttribute('data-suggestion');
+                chatInput.value = suggestion;
+                sendMessage();
+            });
         });
-    });
+    }
+
+    // Initial call
+    initSuggestionChips();
+
+    // New Page functionality
+    if (newPageBtn) {
+        newPageBtn.addEventListener('click', () => {
+            if (confirm('Reset this session? Current chat will be cleared.')) {
+                messagesArea.innerHTML = emptyChatStateHTML;
+                chatInput.value = '';
+                chatInput.style.height = 'auto';
+                initSuggestionChips();
+                messagesArea.scrollTop = 0;
+                console.log('Simplifier session reset.');
+            }
+        });
+    }
 
     clearHistoryBtn.addEventListener('click', () => {
         localStorage.removeItem('simplifier_history');
@@ -145,16 +171,56 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    let simplifierData = [];
-
-    // Load simplifier data
-    async function loadSimplifierData() {
-        try {
-            const response = await fetch('data/simplifier.json');
-            simplifierData = await response.json();
-        } catch (error) {
-            console.error('Error loading simplifier data:', error);
+    // Load simplifier data (Hardcoded for file:// protocol compatibility)
+    let simplifierData = [
+        {
+            "input": "int temp = a;\na = b;\nb = temp;",
+            "output": "**Simplified Code (C++):**\n```cpp\nstd::swap(a, b);\n```\n\n**Improvements:**\n- Uses standard library function\n- Clearer intent\n- Optimized by compiler"
+        },
+        {
+            "input": "temp = x\nx = y\ny = temp",
+            "output": "**Simplified Code (Python):**\n```python\nx, y = y, x\n```\n\n**Improvements:**\n- Pythonic tuple unpacking\n- More concise\n- No temporary variable"
+        },
+        {
+            "input": "System.out.println(\"Hello\");\nSystem.out.println(\"World\");",
+            "output": "**Simplified Code:**\n```java\nSystem.out.println(\"Hello World\");\n```\n\n**Improvements:**\n- Combined I/O operations\n- Reduced overhead"
+        },
+        {
+            "input": "x = 0\nfor i in range(len(arr)):\n    x = x + arr[i]",
+            "output": "**Simplified Code:**\n```python\nx = sum(arr)\n```\n\n**Improvements:**\n- Used built-in sum() function\n- More readable and Pythonic\n- Faster execution"
+        },
+        {
+            "input": "if x > 5:\n    return True\nelse:\n    return False",
+            "output": "**Simplified Code:**\n```python\nreturn x > 5\n```\n\n**Improvements:**\n- Direct boolean return\n- Eliminates unnecessary if-else\n- More concise"
+        },
+        {
+            "input": "result = []\nfor item in items:\n    result.append(item * 2)",
+            "output": "**Simplified Code:**\n```python\nresult = [item * 2 for item in items]\n```\n\n**Improvements:**\n- List comprehension is more Pythonic\n- Single line instead of three\n- Better performance"
+        },
+        {
+            "input": "temp = a\na = b\nb = temp",
+            "output": "**Simplified Code:**\n```python\na, b = b, a\n```\n\n**Improvements:**\n- Python's tuple unpacking\n- No temporary variable needed\n- More elegant"
+        },
+        {
+            "input": "if len(my_list) == 0:\n    print('Empty')",
+            "output": "**Simplified Code:**\n```python\nif not my_list:\n    print('Empty')\n```\n\n**Improvements:**\n- More Pythonic\n- Empty lists are falsy\n- Cleaner syntax"
+        },
+        {
+            "input": "if (a > b) {\n    max = a;\n} else {\n    max = b;\n}",
+            "output": "**Simplified Code:**\n```c\nmax = (a > b) ? a : b;\n```\n\n**Improvements:**\n- Uses ternary operator\n- Single line instead of five\n- Common professional pattern"
+        },
+        {
+            "input": "for (int i = 0; i < vec.size(); i++) {\n    std::cout << vec[i] << std::endl;\n}",
+            "output": "**Simplified Code:**\n```cpp\nfor (const auto& item : vec) {\n    std::cout << item << std::endl;\n}\n```\n\n**Improvements:**\n- Range-based for loop (C++11+)\n- No manual index management\n- Cleaner and safer syntax"
+        },
+        {
+            "input": "<div id=\"header\">\n    <div class=\"nav-links\">\n        <div class=\"link\">Home</div>\n    </div>\n</div>",
+            "output": "**Simplified Code:**\n```html\n<header>\n    <nav>\n        <ul><li>Home</li></ul>\n    </nav>\n</header>\n```\n\n**Improvements:**\n- Uses semantic HTML5 tags\n- Better for SEO and Accessibility\n- Much cleaner structure"
         }
+    ];
+
+    async function loadSimplifierData() {
+        console.log("Simplifier data loaded locally");
     }
 
     function findSampleResponse(userMessage) {
@@ -162,29 +228,56 @@ document.addEventListener('DOMContentLoaded', () => {
             return null;
         }
 
-        const samples = simplifierData;
+        // Helper: Tokenize string into meaningful words
+        const getTokens = (str) => {
+            return str.toLowerCase()
+                .replace(/[^a-z0-9\s]/g, ' ') // Replace symbols with spaces
+                .split(/\s+/)                  // Split by whitespace
+                .filter(t => t.length >= 1);
+        };
 
-        // Normalize helper: remove all whitespace and convert to lowercase
+        const inputTokens = getTokens(userMessage);
+
+        // 1. First, check for Normalized Substring Match (Strongest match)
         const normalize = (str) => str.toLowerCase().replace(/\s+/g, '').trim();
-
         const normalizedInput = normalize(userMessage);
 
-        // 1. Try exact match after normalization
-        for (let sample of samples) {
-            if (normalize(sample.input) === normalizedInput) {
+        for (let sample of simplifierData) {
+            const normSample = normalize(sample.input);
+            if (normSample.includes(normalizedInput) || normalizedInput.includes(normSample)) {
                 return sample.output;
             }
         }
 
-        // 2. Try partial match: if input contains normalized sample or vice versa
-        for (let sample of samples) {
-            const normalizedSample = normalize(sample.input);
-            if (normalizedInput.includes(normalizedSample) || normalizedSample.includes(normalizedInput)) {
-                // Only return if at least 20 chars match to avoid false positives with very short snippets
-                if (normalizedSample.length > 20 || normalizedInput.length > 20) {
-                    return sample.output;
+        // 2. Fallback to Jaccard Similarity (Fuzzy match)
+
+        let bestMatch = null;
+        let maxScore = 0;
+
+        for (let sample of simplifierData) {
+            const sampleTokens = getTokens(sample.input);
+            if (sampleTokens.length === 0) continue;
+
+            let matchCount = 0;
+            const sampleTokenSet = new Set(sampleTokens);
+
+            for (let token of inputTokens) {
+                if (sampleTokenSet.has(token)) {
+                    matchCount++;
                 }
             }
+
+            const unionSize = inputTokens.length + sampleTokens.length - matchCount;
+            const score = unionSize > 0 ? matchCount / unionSize : 0;
+
+            if (score > maxScore) {
+                maxScore = score;
+                bestMatch = sample;
+            }
+        }
+
+        if (maxScore > 0.2) {
+            return bestMatch.output;
         }
 
         return `❌ **Invalid Question**\n\nThis specific program was not found in our offline simplification database.\n\nPlease provide a code snippet that needs simplification.`;
@@ -289,42 +382,48 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function saveToHistory(message) {
-        const history = JSON.parse(localStorage.getItem('simplifier_history') || '[]');
-        const entry = {
-            id: Date.now(),
-            message: message.substring(0, 50),
-            time: new Date().toLocaleTimeString()
-        };
-        history.unshift(entry);
-        localStorage.setItem('simplifier_history', JSON.stringify(history.slice(0, 10)));
-        renderHistory();
+    async function saveToHistory(message) {
+        try {
+            await db.collection('simplifier_history').add({
+                message: message.substring(0, 50),
+                fullMessage: message,
+                time: new Date().toLocaleTimeString(),
+                timestamp: new Date()
+            });
+        } catch (e) {
+            console.error("Error adding document: ", e);
+        }
     }
 
     function renderHistory() {
-        const history = JSON.parse(localStorage.getItem('simplifier_history') || '[]');
-        if (history.length === 0) {
-            historyList.innerHTML = '<p class="empty-state">No recent simplifications</p>';
-            return;
-        }
-
-        historyList.innerHTML = history.map(item => `
-            <div class="history-item" data-id="${item.id}">
-                <span class="time">${item.time}</span>
-                <div class="snippet">${item.message}...</div>
-            </div>
-        `).join('');
-
-        document.querySelectorAll('#simplifier-history .history-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const id = item.getAttribute('data-id');
-                const history = JSON.parse(localStorage.getItem('simplifier_history') || '[]');
-                const selected = history.find(h => h.id == id);
-                if (selected) {
-                    chatInput.value = selected.message;
+        db.collection("simplifier_history").orderBy("timestamp", "desc").limit(20)
+            .onSnapshot((querySnapshot) => {
+                if (querySnapshot.empty) {
+                    historyList.innerHTML = '<p class="empty-state">No recent simplifications</p>';
+                    return;
                 }
+
+                let html = '';
+                querySnapshot.forEach((doc) => {
+                    const item = doc.data();
+                    html += `
+                    <div class="history-item" data-full-message="${item.fullMessage.replace(/"/g, '&quot;')}">
+                        <span class="time">${item.time}</span>
+                        <div class="snippet">${item.message}...</div>
+                    </div>
+                `;
+                });
+                historyList.innerHTML = html;
+
+                document.querySelectorAll('#simplifier-history .history-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const fullMessage = item.getAttribute('data-full-message');
+                        if (fullMessage) {
+                            chatInput.value = fullMessage;
+                        }
+                    });
+                });
             });
-        });
     }
 
     renderHistory();

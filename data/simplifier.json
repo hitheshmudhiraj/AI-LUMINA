@@ -1,4 +1,15 @@
-[
+    {
+        "input": "int temp = a;\na = b;\nb = temp;",
+        "output": "**Simplified Code (C++):**\n```cpp\nstd::swap(a, b);\n```\n\n**Improvements:**\n- Uses standard library function\n- Clearer intent\n- Optimized by compiler"
+    },
+    {
+        "input": "temp = x\nx = y\ny = temp",
+        "output": "**Simplified Code (Python):**\n```python\nx, y = y, x\n```\n\n**Improvements:**\n- Pythonic tuple unpacking\n- More concise\n- No temporary variable"
+    },
+    {
+        "input": "System.out.println(\"Hello\");\nSystem.out.println(\"World\");",
+        "output": "**Simplified Code:**\n```java\nSystem.out.println(\"Hello World\");\n```\n\n**Improvements:**\n- Combined I/O operations\n- Reduced overhead"
+    },
     {
         "input": "x = 0\nfor i in range(len(arr)):\n    x = x + arr[i]",
         "output": "**Simplified Code:**\n```python\nx = sum(arr)\n```\n\n**Improvements:**\n- Used built-in sum() function\n- More readable and Pythonic\n- Faster execution"

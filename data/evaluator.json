@@ -1,4 +1,19 @@
-[
+    {
+        "input": "print(\"Hello World\")",
+        "output": "**Analysis:** Likely HUMAN-WRITTEN (95% confidence)\n\n**Reasoning:**\n- Extremely basic standard example\n- No comments or docstrings\n- Universal first program\n\n**Indicators:** `Hello World` is the most common code snippet written by humans learning a language."
+    },
+    {
+        "input": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello World\");\n    }\n}",
+        "output": "**Analysis:** Likely HUMAN-WRITTEN (90% confidence)\n\n**Reasoning:**\n- Standard Java boilerplate\n- Typical formatting for tutorials\n\n**Indicators:** Humans often memorize this exact structure."
+    },
+    {
+        "input": "a, b = b, a",
+        "output": "**Analysis:** Likely HUMAN-WRITTEN (80% confidence)\n\n**Reasoning:**\n- Idiomatic Python usage\n- Very concise\n- Common interview/learning snippet\n\n**Indicators:** Experienced Python developers use this pattern frequently."
+    },
+    {
+        "input": "temp = a; a = b; b = temp;",
+        "output": "**Analysis:** Likely HUMAN-WRITTEN (85% confidence)\n\n**Reasoning:**\n- Classic imperative swap logic\n- Used in almost every intro CS class for C/C++/Java\n\n**Indicators:** This is the foundational way humans learn variable manipulation."
+    },
     {
         "input": "def calculate_sum(numbers):\n    total = 0\n    for num in numbers:\n        total += num\n    return total",
         "output": "**Analysis:** Likely HUMAN-WRITTEN (85% confidence)\n\n**Reasoning:**\n- Uses verbose loop instead of built-in sum()\n- Variable naming is clear but basic\n- Traditional imperative style\n- Common beginner pattern\n\n**Indicators:** Human developers often write explicit loops when learning."

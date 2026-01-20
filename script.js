@@ -15,16 +15,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Update icon
         if (themeToggle) {
-            const icon = themeToggle.querySelector('i');
-            if (icon) {
-                if (theme === 'light') {
-                    icon.setAttribute('data-lucide', 'sun');
-                } else {
-                    icon.setAttribute('data-lucide', 'moon');
-                }
-                if (window.lucide) {
-                    window.lucide.createIcons();
-                }
+            themeToggle.innerHTML = theme === 'light' ?
+                '<i data-lucide="sun"></i>' :
+                '<i data-lucide="moon"></i>';
+
+            if (window.lucide) {
+                window.lucide.createIcons();
             }
         }
     };

@@ -1,4 +1,15 @@
-[
+    {
+        "question": "print(Hello World)",
+        "answer": "**Bug Found:**\nMissing double quotes around the string.\n\n**Corrected Code:**\n```python\nprint(\"Hello World\")\n```\n\n**Explanation:** Strings in Python must be enclosed in double quotes `\"` or single quotes `'`. Without them, Python thinks you are referring to variables named `Hello` and `World`."
+    },
+    {
+        "question": "print(Hello)",
+        "answer": "**Bug Found:**\nMissing double quotes around the string.\n\n**Corrected Code:**\n```python\nprint(\"Hello\")\n```\n\n**Explanation:** Strings must be enclosed in quotes. Python treats `Hello` as an undefined variable name."
+    },
+    {
+        "question": "a = 5\nb = 10\na = b\nb = a\nprint(a, b)",
+        "answer": "**Bug Found:**\nIncorrect swapping logic. `a = b` overwrites the initial value of `a`, losing it forever.\n\n**Corrected Code:**\n```python\na = 5\nb = 10\ntemp = a\na = b\nb = temp\nprint(a, b)\n# Or Pythonic way: a, b = b, a\n```\n\n**Explanation:** Use a temporary variable to hold the value of `a` before it gets overwritten."
+    },
     {
         "question": "def say_hello()\nprint('Hello World')\nsay_hello",
         "answer": "**Bugs Found:**\n1. Missing colon after function definition.\n2. Missing indentation for the function body.\n3. Missing parentheses when calling the function.\n\n**Corrected Code:**\n```python\ndef say_hello():\n    print('Hello World')\n\nsay_hello()\n```\n\n**Explanation:** Functions need a colon and indented body. To execute a function, you must use parentheses `()`."
@@ -73,6 +84,16 @@
     },
     {
         "question": "<ul>\n    <div>Item 1</div>\n    <li>Item 2</li>\n</ul>",
-        "answer": "**Bug Found:**\nIncorrect nesting. A `<ul>` or `<ol>` should only contain `<li>` elements as direct children.\n\n**Corrected Code:**\n```html\n<ul>\n    <li>Item 1</li>\n    <li>Item 2</li>\n</ul>\n```\n\n**Explanation:** To maintain valid HTML5 structure, strictly use list item tags (`<li>`) inside list containers."
-    }
-]
+        "answer": "**Bug Found:**\nIncorrect nesting. A `<ul>` or `<ol>` should only contain `<li>` elements as direct children.\n\n**Corrected Code:**\n```html\n<ul>\n    <li>Item 1</li>\n    <li>Item 2</li>\n</ul>\n```\n\n**Explanation:** To maintain valid HTML5 structure, strictly use list item tags (`<li>`) inside list containers."{
+            "question": "System.out.println(Hello World);",
+            "answer": "**Bug Found:**\nMissing double quotes around the string in Java.\n\n**Corrected Code:**\n```java\nSystem.out.println(\"Hello World\");\n```\n\n**Explanation:** Java requires double quotes `\"` for string literals."
+        },
+        {
+            "question": "int a = 5; int b = 10; a = b; b = a;",
+            "answer": "**Bug Found:**\nLogic error in swapping (Java/C++). `a` loses its original value.\n\n**Corrected Code:**\n```java\nint temp = a;\na = b;\nb = temp;\n```\n\n**Explanation:** You need a temporary variable to perform a swap correctly in Java/C++."
+        },
+        {
+            "question": "#include <stdio.h>\nmain() { printf(Hello World); }",
+            "answer": "**Bug Found:**\nMissing double quotes in `printf` and missing return type.\n\n**Corrected Code:**\n```c\n#include <stdio.h>\nint main() {\n    printf(\"Hello World\");\n    return 0;\n}\n```\n\n**Explanation:** In C, strings must be in double quotes. Also, standard `main` should return `int`."
+        }
+    ]

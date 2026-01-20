@@ -1,4 +1,7 @@
-// Checker Chatbot Module
+// Evaluator Chatbot Module
+// Helper for Firestore
+// const { collection, addDoc, onSnapshot, query, orderBy, limit } = firebase.firestore;
+
 document.addEventListener('DOMContentLoaded', () => {
     const messagesArea = document.getElementById('checker-messages');
     const chatInput = document.getElementById('checker-chat-input');
@@ -8,6 +11,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const imageInput = document.getElementById('checker-image-input');
     const historyList = document.getElementById('checker-history-list');
     const clearHistoryBtn = document.getElementById('clear-checker-history');
+    const newPageBtn = document.getElementById('new-evaluator-page');
+
+    // Store initial empty state HTML
+    const emptyChatStateHTML = messagesArea.innerHTML;
 
     let isProcessing = false;
     let recognition = null;
@@ -74,17 +81,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Suggestion chips
-    document.querySelectorAll('#checker-messages .suggestion-chip').forEach(chip => {
-        chip.addEventListener('click', () => {
-            const suggestion = chip.getAttribute('data-suggestion');
-            chatInput.value = suggestion;
-            sendMessage();
+    // Suggestion chips initialization
+    function initSuggestionChips() {
+        document.querySelectorAll('#checker-messages .suggestion-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                const suggestion = chip.getAttribute('data-suggestion');
+                chatInput.value = suggestion;
+                sendMessage();
+            });
         });
-    });
+    }
+
+    // Initial call
+    initSuggestionChips();
+
+    // New Page functionality
+    if (newPageBtn) {
+        newPageBtn.addEventListener('click', () => {
+            if (confirm('Reset evaluation? This will clear the current chat.')) {
+                messagesArea.innerHTML = emptyChatStateHTML;
+                chatInput.value = '';
+                chatInput.style.height = 'auto';
+                initSuggestionChips();
+                messagesArea.scrollTop = 0;
+                console.log('Evaluator session reset.');
+            }
+        });
+    }
 
     clearHistoryBtn.addEventListener('click', () => {
-        localStorage.removeItem('checker_history');
+        localStorage.removeItem('evaluator_history');
         renderHistory();
     });
 
@@ -113,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 body: JSON.stringify({
                     message: message,
-                    module: 'checker'
+                    module: 'evaluator'
                 })
             });
 
@@ -145,49 +171,117 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    let checkerData = [];
-
-    // Load checker data
-    async function loadCheckerData() {
-        try {
-            const response = await fetch('data/checker.json');
-            checkerData = await response.json();
-        } catch (error) {
-            console.error('Error loading checker data:', error);
+    // Load evaluator data (Hardcoded for file:// protocol compatibility)
+    let evaluatorData = [
+        {
+            "input": "print(\"Hello World\")",
+            "output": "**Analysis:** Likely HUMAN-WRITTEN (95% confidence)\n\n**Reasoning:**\n- Extremely basic standard example\n- No comments or docstrings\n- Universal first program\n\n**Indicators:** `Hello World` is the most common code snippet written by humans learning a language."
+        },
+        {
+            "input": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello World\");\n    }\n}",
+            "output": "**Analysis:** Likely HUMAN-WRITTEN (90% confidence)\n\n**Reasoning:**\n- Standard Java boilerplate\n- Typical formatting for tutorials\n\n**Indicators:** Humans often memorize this exact structure."
+        },
+        {
+            "input": "a, b = b, a",
+            "output": "**Analysis:** Likely HUMAN-WRITTEN (80% confidence)\n\n**Reasoning:**\n- Idiomatic Python usage\n- Very concise\n- Common interview/learning snippet\n\n**Indicators:** Experienced Python developers use this pattern frequently."
+        },
+        {
+            "input": "temp = a; a = b; b = temp;",
+            "output": "**Analysis:** Likely HUMAN-WRITTEN (85% confidence)\n\n**Reasoning:**\n- Classic imperative swap logic\n- Used in almost every intro CS class for C/C++/Java\n\n**Indicators:** This is the foundational way humans learn variable manipulation."
+        },
+        {
+            "input": "def calculate_sum(numbers):\n    total = 0\n    for num in numbers:\n        total += num\n    return total",
+            "output": "**Analysis:** Likely HUMAN-WRITTEN (85% confidence)\n\n**Reasoning:**\n- Uses verbose loop instead of built-in sum()\n- Variable naming is clear but basic\n- Traditional imperative style\n- Common beginner pattern\n\n**Indicators:** Human developers often write explicit loops when learning."
+        },
+        {
+            "input": "def fibonacci(n: int) -> int:\n    \"\"\"Calculate nth Fibonacci number using memoization.\"\"\"\n    memo = {0: 0, 1: 1}\n    def fib(x):\n        if x not in memo:\n            memo[x] = fib(x-1) + fib(x-2)\n        return memo[x]\n    return fib(n)",
+            "output": "**Analysis:** Likely AI-GENERATED (75% confidence)\n\n**Reasoning:**\n- Type hints present\n- Comprehensive docstring\n- Optimal algorithm choice (memoization)\n- Clean nested function structure\n\n**Indicators:** AI tends to include type hints and docstrings consistently."
+        },
+        {
+            "input": "x=5\ny=10\nz=x+y\nprint(z)",
+            "output": "**Analysis:** Likely HUMAN-WRITTEN (90% confidence)\n\n**Reasoning:**\n- No spaces around operators\n- Very basic logic\n- No comments or documentation\n- Beginner-level code\n\n**Indicators:** Inconsistent spacing is common in human-written code."
+        },
+        {
+            "input": "#include <stdlib.h>\nint main() {\n    int *a = malloc(10 * sizeof(int));\n    // process a\n    free(a);\n    return 0;\n}",
+            "output": "**Analysis:** Likely AI-GENERATED (70% confidence)\n\n**Reasoning:**\n- Correct `sizeof` usage\n- Includes `free()` consistently\n- Clean minimal structure\n- No manual byte counting\n\n**Indicators:** AI is very reliable with basic C allocation patterns."
+        },
+        {
+            "input": "void process() {\n    int* data = new int[100];\n    for(int i=0; i<100; i++) data[i] = i;\n    delete[] data;\n}",
+            "output": "**Analysis:** Likely HUMAN-WRITTEN (80% confidence)\n\n**Reasoning:**\n- Manual memory management (raw pointers)\n- No exception safety\n- Missing `std::` prefixes\n- Traditional school-style code\n\n**Indicators:** Humans often use raw 'new'/'delete' in learning exercises."
+        },
+        {
+            "input": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <title>AI Generated Page</title>\n</head>\n<body>\n    <main>\n        <section>\n            <h2>Perfect Content</h2>\n        </section>\n    </main>\n</body>\n</html>",
+            "output": "**Analysis:** Likely AI-GENERATED (85% confidence)\n\n**Reasoning:**\n- Perfect indentation\n- All essential meta tags present\n- Semantic hierarchy (`main` > `section` > `h2`)\n- Standard doc type declaration\n\n**Indicators:** AI consistently generates boilerplate-perfect HTML."
         }
+    ];
+
+    async function loadEvaluatorData() {
+        console.log("Evaluator data loaded locally");
     }
 
     function findSampleResponse(userMessage) {
-        if (!checkerData || checkerData.length === 0) {
+        if (!evaluatorData || evaluatorData.length === 0) {
             return null;
         }
 
-        const samples = checkerData;
+        // Helper: Tokenize string into meaningful words
+        const getTokens = (str) => {
+            return str.toLowerCase()
+                .replace(/[^a-z0-9\s]/g, ' ') // Replace symbols with spaces
+                .split(/\s+/)                  // Split by whitespace
+                .filter(t => t.length >= 1);   // Keep all tokens
+        };
 
-        // Normalize helper: remove all whitespace and convert to lowercase
+        const inputTokens = getTokens(userMessage);
+
+        // 1. First, check for Normalized Substring Match (Strongest match)
         const normalize = (str) => str.toLowerCase().replace(/\s+/g, '').trim();
-
         const normalizedInput = normalize(userMessage);
 
-        // 1. Try exact match after normalization
-        for (let sample of samples) {
-            if (normalize(sample.input) === normalizedInput) {
+        for (let sample of evaluatorData) {
+            const normSample = normalize(sample.input);
+            if (normSample.includes(normalizedInput) || normalizedInput.includes(normSample)) {
                 return sample.output;
             }
         }
 
-        // 2. Try partial match: if input contains normalized sample or vice versa
-        for (let sample of samples) {
-            const normalizedSample = normalize(sample.input);
-            if (normalizedInput.includes(normalizedSample) || normalizedSample.includes(normalizedInput)) {
-                // Only return if at least 20 chars match to avoid false positives with very short snippets
-                if (normalizedSample.length > 20 || normalizedInput.length > 20) {
-                    return sample.output;
+        // 2. Fallback to Jaccard/Overlap Similarity (Fuzzy match)
+
+        let bestMatch = null;
+        let maxScore = 0;
+
+        for (let sample of evaluatorData) {
+            const sampleTokens = getTokens(sample.input);
+            if (sampleTokens.length === 0) continue;
+
+            // Calculate overlap (Number of input tokens found in sample)
+            let matchCount = 0;
+            const sampleTokenSet = new Set(sampleTokens);
+
+            for (let token of inputTokens) {
+                if (sampleTokenSet.has(token)) {
+                    matchCount++;
                 }
+            }
+
+            // Score: Weighted overlap. Using Jaccard Similarity would be nice, 
+            // but simple overlap ratio relative to sample size is effective for "detection".
+            // Let's use: (Matches / (Input Length + Sample Length - Matches)) -> Jaccard
+            const unionSize = inputTokens.length + sampleTokens.length - matchCount;
+            const score = unionSize > 0 ? matchCount / unionSize : 0;
+
+            if (score > maxScore) {
+                maxScore = score;
+                bestMatch = sample;
             }
         }
 
-        return `❌ **Invalid Question**\n\nThis code snippet was not found in our offline verification database.\n\nPlease provide a program to check for AI generation or human authorship.`;
+        // Threshold: 0.2 (20% overlap) is usually enough for "rough" code matching
+        if (maxScore > 0.2) {
+            return bestMatch.output;
+        }
+
+        return `❌ **Invalid Question**\n\nThis code snippet was not found in our offline verification database.\n\nPlease provide a program to evaluate for AI generation or human authorship.`;
     }
 
     function addMessage(type, content) {
@@ -289,43 +383,50 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function saveToHistory(message) {
-        const history = JSON.parse(localStorage.getItem('checker_history') || '[]');
-        const entry = {
-            id: Date.now(),
-            message: message.substring(0, 50),
-            time: new Date().toLocaleTimeString()
-        };
-        history.unshift(entry);
-        localStorage.setItem('checker_history', JSON.stringify(history.slice(0, 10)));
-        renderHistory();
+    async function saveToHistory(message) {
+        try {
+            await db.collection('evaluator_history').add({
+                message: message.substring(0, 50),
+                fullMessage: message,
+                time: new Date().toLocaleTimeString(),
+                timestamp: new Date()
+            });
+        } catch (e) {
+            console.error("Error adding document: ", e);
+        }
     }
 
     function renderHistory() {
-        const history = JSON.parse(localStorage.getItem('checker_history') || '[]');
-        if (history.length === 0) {
-            historyList.innerHTML = '<p class="empty-state">No recent checks</p>';
-            return;
-        }
-
-        historyList.innerHTML = history.map(item => `
-            <div class="history-item" data-id="${item.id}">
-                <span class="time">${item.time}</span>
-                <div class="snippet">${item.message}...</div>
-            </div>
-        `).join('');
-
-        document.querySelectorAll('#checker-history .history-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const id = item.getAttribute('data-id');
-                const history = JSON.parse(localStorage.getItem('checker_history') || '[]');
-                const selected = history.find(h => h.id == id);
-                if (selected) {
-                    chatInput.value = selected.message;
+        db.collection("evaluator_history").orderBy("timestamp", "desc").limit(20)
+            .onSnapshot((querySnapshot) => {
+                if (querySnapshot.empty) {
+                    historyList.innerHTML = '<p class="empty-state">No recent checks</p>';
+                    return;
                 }
+
+                let html = '';
+                querySnapshot.forEach((doc) => {
+                    const item = doc.data();
+                    html += `
+                        <div class="history-item" data-full-message="${item.fullMessage.replace(/"/g, '&quot;')}">
+                            <span class="time">${item.time}</span>
+                            <div class="snippet">${item.message}...</div>
+                        </div>
+                    `;
+                });
+                historyList.innerHTML = html;
+
+                document.querySelectorAll('#checker-history .history-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const fullMessage = item.getAttribute('data-full-message');
+                        if (fullMessage) {
+                            chatInput.value = fullMessage;
+                        }
+                    });
+                });
             });
-        });
     }
 
     renderHistory();
+    loadEvaluatorData();
 });

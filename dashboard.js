@@ -36,16 +36,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Update icon
         if (themeToggle) {
-            const icon = themeToggle.querySelector('i');
-            if (icon) {
-                if (theme === 'light') {
-                    icon.setAttribute('data-lucide', 'sun');
-                } else {
-                    icon.setAttribute('data-lucide', 'moon');
-                }
-                if (window.lucide) {
-                    window.lucide.createIcons();
-                }
+            themeToggle.innerHTML = theme === 'light' ?
+                '<i data-lucide="sun"></i>' :
+                '<i data-lucide="moon"></i>';
+
+            if (window.lucide) {
+                window.lucide.createIcons();
             }
         }
     };
@@ -70,42 +66,42 @@ document.addEventListener('DOMContentLoaded', () => {
         'checker': getElem('checker-section')
     };
 
-    navLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const feature = link.getAttribute('data-feature');
-            console.log('Switching to feature:', feature);
+    // Navigation View Switching Function
+    const showSection = (feature) => {
+        console.log('Switching to feature:', feature);
 
-            // Update nav state
-            navLinks.forEach(l => l.classList.remove('active'));
-            link.classList.add('active');
-
-            // Switch sections
-            Object.keys(sections).forEach(key => {
-                if (sections[key]) {
-                    sections[key].style.display = (key === feature) ? 'block' : 'none';
-                }
-            });
-
-            // Update welcome header visibility
-            const welcomeSection = document.querySelector('.welcome-section');
-            if (welcomeSection) {
-                welcomeSection.style.display = (feature === 'dashboard') ? 'block' : 'none';
+        // Switch sections
+        Object.keys(sections).forEach(key => {
+            if (sections[key]) {
+                sections[key].style.display = (key === feature) ? 'block' : 'none';
             }
         });
-    });
 
-    // Feature Card Click (Simulation)
+        // Update welcome header visibility
+        const welcomeSection = document.querySelector('.welcome-section');
+        if (welcomeSection) {
+            welcomeSection.style.display = (feature === 'dashboard') ? 'block' : 'none';
+        }
+
+        // Scroll to top
+        window.scrollTo(0, 0);
+    };
+
+    // Feature Card Click
     const featureCards = document.querySelectorAll('.feature-card');
     featureCards.forEach(card => {
         card.addEventListener('click', () => {
             const feature = card.getAttribute('data-feature');
-            const targetLink = document.querySelector(`.nav-link[data-feature="${feature}"]`);
-            if (targetLink) {
-                targetLink.click();
-            } else {
-                console.log(`Launching ${feature}... (View not implemented)`);
-            }
+            showSection(feature);
+        });
+    });
+
+    // Back to Dashboard Button
+    const backBtn = document.querySelectorAll('.back-to-dashboard');
+    backBtn.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            showSection('dashboard');
         });
     });
 

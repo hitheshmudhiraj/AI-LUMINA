@@ -405,6 +405,48 @@ hr {
     color: #e5e7eb;
 }
 
+/* Sidebar Header Refinement */
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+
+.sidebar-title-area {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.new-page-btn {
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    border: none;
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+    width: fit-content;
+}
+
+.new-page-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4);
+    filter: brightness(1.1);
+}
+
+.new-page-btn i {
+    width: 16px;
+    height: 16px;
+}
+
 /* Responsiveness */
 @media (max-width: 992px) {
     .feature-grid {
